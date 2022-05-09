@@ -13,6 +13,11 @@ const ctx = canvas.getContext("2d")
 const snakeLength = 25
 const eatingSound = new Audio('eat.mp3')
 const gameOverSound = new Audio('gameOver.mp3')
+
+const foodImg = new Image()
+foodImg.src = 'food.jpg'
+
+
 let score = 0
 
 h3.textContent = "Score : "+score
@@ -24,7 +29,7 @@ h3.textContent = "Score : "+score
 //     }
 // }
 
-class Fruit{
+class Food{
     
     constructor(x,y){
         this.x = x
@@ -32,9 +37,8 @@ class Fruit{
     }
 
     display(){
-        ctx.fillStyle = "red"
-        ctx.fillRect(this.x,this.y,snakeLength,snakeLength)
-        ctx.stroke()
+        
+        ctx.drawImage(foodImg,this.x,this.y,snakeLength,snakeLength)
     }
 }
 
@@ -57,10 +61,10 @@ class Snake{
             ctx.fillRect(x,y,w,h)
     }
     move(){
-      
-                this.draw(this.head.x,this.head.y  ,this.length ,snakeLength,"#9f9fff") // draw the head
+      // draw the head
+                this.draw(this.head.x,this.head.y  ,this.length ,snakeLength,'#ffff6e')
                 this.body.map(e => { // draw the body
-                this.draw(e.x,e.y,this.length,snakeLength,"#ffff6e")
+                    this.draw(e.x,e.y,this.length,snakeLength,"#4fff4f")
             })
         
     }
@@ -153,7 +157,7 @@ let snake = new Snake(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.f
 
 
 
-let fruit = new Fruit(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
+let food = new Food(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
 let id = null
 
 let time = 100
@@ -166,7 +170,7 @@ function start(){
     DetectCollision()
     UpdateScore()
     ctx.clearRect(0,0,w,h)
-    fruit.display()
+    food.display()
 
     if(snake.direction == 'up') {
         if(!snake.body.length) snake.moveUp()
@@ -234,9 +238,9 @@ const DetectCollision = ()=>{
 
 const UpdateScore = ()=>{
 
-    if(snake.head.x == fruit.x && snake.head.y == fruit.y){
+    if(snake.head.x == food.x && snake.head.y == food.y){
         eatingSound.play()
-        snake.getBigger(fruit.x,fruit.y)
+        snake.getBigger(food.x,food.y)
         score += 10
         if(score >= 200) time = 20
         else if(score >= 150) time = 40
@@ -244,7 +248,7 @@ const UpdateScore = ()=>{
         else if ( score >= 50) time = 80
 
         h3.textContent = "Score : "+score
-        fruit = new Fruit(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
+        food = new Food(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
     }
 }
 const gameOver = ()=>{
@@ -252,7 +256,7 @@ const gameOver = ()=>{
     score = 0
     time = 100
     snake = new Snake(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)],x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
-    fruit = new Fruit(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
+    food = new Food(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
     h3.textContent = "Score : "+score
 
 }
