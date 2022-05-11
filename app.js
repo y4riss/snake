@@ -124,21 +124,22 @@ class Snake{
 
 document.body.addEventListener("keydown",(e)=>{
 
-    if(e.code === 'ArrowUp'){
+    if(e.keyCode === 38){
         snake.direction = 'up'
         snake.moving = true
     }
-    else if(e.code === 'ArrowDown'){
+    else if(e.keyCode=== 40){
         snake.direction = 'down'
         snake.moving = true
     }
-    else if(e.code === 'ArrowLeft'){
+    else if(e.keyCode === 37){
         snake.direction = 'left'
     }
-    else if(e.code === 'ArrowRight'){
+    else if(e.keyCode === 39){
         snake.direction = 'right'
         snake.moving = true
     }
+
 
 })
 
@@ -242,7 +243,7 @@ const UpdateScore = ()=>{
         eatingSound.play()
         snake.getBigger(food.x,food.y)
         score += 10
-        if(score >= 200) time = 20
+        if(score >= 200) time = 60
         else if(score >= 150) time = 40
         else if (score >= 100) time = 60
         else if ( score >= 50) time = 80
