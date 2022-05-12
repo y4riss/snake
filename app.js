@@ -1,33 +1,58 @@
 const canvas = document.querySelector("canvas")
-const h3 = document.querySelector("h3")
-// grid of 30 by 30
-
-canvas.width = 500
-canvas.height = 500
+const currentScore = document.querySelector("#current-score")
+const highestScore = document.querySelector("#highest-score")
+const grid = document.querySelector(".grid")
+canvas.width = 600
+canvas.height = 600
 const w = canvas.width 
 const h = canvas.height 
 
 
+const createDiv = (cls) =>{
+    const div = document.createElement("div")
+    div.classList.add(cls)
+    grid.appendChild(div)
+}
+const DrawBoard = ()=>{
+
+    for ( let y = 0 ; y < 15 ; y++){
+        
+        for ( let x = 0 ; x < 15 ; x++){
+
+            if( (x+y) %2 ==0) createDiv("cell1")
+            else createDiv("cell2")
+
+        }
+
+    }
+}
+
+DrawBoard()
+
+//local storage
+let hScore = localStorage.getItem("hScore");
+if(hScore){
+    highestScore.textContent = "Highest score : "+ hScore
+}
+else  highestScore.textContent = "Highest score : "+ 0
+
+
+
+
 
 const ctx = canvas.getContext("2d")
-const snakeLength = 25
-const eatingSound = new Audio('eat.mp3')
-const gameOverSound = new Audio('gameOver.mp3')
+const snakeLength = 40
+const eatingSound = new Audio('audio/eat.mp3')
+const gameOverSound = new Audio('audio/gameOver.mp3')
+
 
 const foodImg = new Image()
 foodImg.src = 'food.jpg'
-
-
 let score = 0
 
-h3.textContent = "Score : "+score
+currentScore.textContent = "Score : "+score
 
-// for ( let y = 0 ; y < h ; y++){
 
-//     for ( let x = 0 ; x < w ; x++){
-//         ctx.rect(x*snakeLength,y*snakeLength,snakeLength,snakeLength);
-//     }
-// }
 
 class Food{
     
@@ -44,7 +69,7 @@ class Food{
 
 class Snake{
 
-    speed = snakeLength
+    offsetPlacement = snakeLength
     moving = false
     body = []
     direction = null
@@ -54,52 +79,55 @@ class Snake{
     }
     draw(x,y,w,h,color){
 
-            
-            ctx.fillStyle = "black"
-            ctx.fillRect(x-1,y-1,w+2,h+2)
             ctx.fillStyle = color
             ctx.fillRect(x,y,w,h)
     }
     move(){
       // draw the head
-                this.draw(this.head.x,this.head.y  ,this.length ,snakeLength,'#ffff6e')
+                this.draw(this.head.x,this.head.y  ,this.length ,snakeLength,'#c30720')
+
                 this.body.map(e => { // draw the body
-                    this.draw(e.x,e.y,this.length,snakeLength,"#4fff4f")
+                    this.draw(e.x,e.y,this.length,snakeLength,"#2e2e2e")
             })
         
     }
 
     moveUp(){
 
-        this.speed = -Math.abs(this.speed)
+        this.offsetPlacement = -Math.abs(this.offsetPlacement)
         this.followTheHead() // shift the snake body part so that each part is the next one , and the first part becomes the head
-        this.head.y += this.speed // move the head
+        this.head.y += this.offsetPlacement // move the head
 
         this.move() // draw the head and body in updated position
+        this.draw(this.head.x+10,this.head.y,this.length/4 ,snakeLength/4,'#2e2e2e')
 
         
     }
     moveDown(){
-        this.speed = Math.abs(this.speed)
+        this.offsetPlacement = Math.abs(this.offsetPlacement)
         this.followTheHead()
-        this.head.y += this.speed
+        this.head.y += this.offsetPlacement
         this.move()
+        this.draw(this.head.x+10,this.head.y+30,this.length/4 ,snakeLength/4,'#2e2e2e')
 
     }
     moveLeft(){
 
-            this.speed = -Math.abs(this.speed)
+            this.offsetPlacement = -Math.abs(this.offsetPlacement)
             this.followTheHead()
-            this.head.x += this.speed
+            this.head.x += this.offsetPlacement
             this.move()
+            this.draw(this.head.x,this.head.y+10,this.length/4 ,snakeLength/4,'#2e2e2e')
 
     }
     moveRight(){
 
-        this.speed = Math.abs(this.speed)
+        this.offsetPlacement = Math.abs(this.offsetPlacement)
         this.followTheHead()
-        this.head.x += this.speed
+        this.head.x += this.offsetPlacement
         this.move()
+        this.draw(this.head.x+30,this.head.y+10,this.length/4 ,snakeLength/4,'#2e2e2e')
+
 
     }
     getBigger(x,y){
@@ -155,9 +183,6 @@ for(let i = snakeLength ; i < h ; i+=snakeLength){
 
 
 let snake = new Snake(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)],x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
-
-
-
 let food = new Food(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
 let id = null
 
@@ -168,11 +193,11 @@ let time = 100
 function start(){
 
     setTimeout(start,time)
+    
     DetectCollision()
     UpdateScore()
     ctx.clearRect(0,0,w,h)
     food.display()
-
     if(snake.direction == 'up') {
         if(!snake.body.length) snake.moveUp()
         else{
@@ -225,7 +250,6 @@ function start(){
     }
     else snake.move()
 
-
 }
 
 const DetectCollision = ()=>{
@@ -243,22 +267,28 @@ const UpdateScore = ()=>{
         eatingSound.play()
         snake.getBigger(food.x,food.y)
         score += 10
-        if(score >= 200) time = 60
-        else if(score >= 150) time = 40
-        else if (score >= 100) time = 60
-        else if ( score >= 50) time = 80
+        if(score % 50 == 0 && score <=300)
+            time -= 10
 
-        h3.textContent = "Score : "+score
+        currentScore.textContent = "Score : "+score
         food = new Food(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
     }
 }
+
 const gameOver = ()=>{
     gameOverSound.play()
+    if(hScore < score){
+        localStorage.setItem('hScore',score)
+        hScore = localStorage.getItem("hScore");
+        highestScore.textContent = "Highest score : "+ hScore
+    }
     score = 0
     time = 100
     snake = new Snake(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)],x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
     food = new Food(x_arr[Math.floor(Math.random()*x_arr.length)],y_arr[Math.floor(Math.random()*y_arr.length)])
-    h3.textContent = "Score : "+score
+    currentScore.textContent = "Score : "+score
 
 }
+
+
 start()
