@@ -168,6 +168,22 @@ document.body.addEventListener("keydown",(e)=>{
         snake.moving = true
     }
 
+    // Add a stop condition to control the snake's movement.
+    // If the key is the 'space' key, stop the snake from moving.
+    
+    else if(e.keyCode === 83){
+        if(!snake.moving){
+            snake.direction = history;
+            snake.moving = true;push 
+        }
+        else{
+            snake.direction = null;
+            snake.moving = false;
+            console.log('snak moving most be false ');
+        }
+    }
+  
+
 
 })
 
